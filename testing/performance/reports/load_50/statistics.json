@@ -1,0 +1,50 @@
+{
+  "GET - List Courses" : {
+    "transaction" : "GET - List Courses",
+    "sampleCount" : 90486,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 39.404283535574415,
+    "medianResTime" : 36.0,
+    "minResTime" : 1.0,
+    "maxResTime" : 165.0,
+    "pct1ResTime" : 59.0,
+    "pct2ResTime" : 67.0,
+    "pct3ResTime" : 83.0,
+    "throughput" : 754.30772180495,
+    "receivedKBytesPerSec" : 196.6798454315641,
+    "sentKBytesPerSec" : 94.28846522561875
+  },
+  "Total" : {
+    "transaction" : "Total",
+    "sampleCount" : 180930,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 29.041916763388976,
+    "medianResTime" : 27.0,
+    "minResTime" : 0.0,
+    "maxResTime" : 187.0,
+    "pct1ResTime" : 60.0,
+    "pct2ResTime" : 69.0,
+    "pct3ResTime" : 100.0,
+    "throughput" : 1508.2653239856952,
+    "receivedKBytesPerSec" : 9223.555043415876,
+    "sentKBytesPerSec" : 180.4340115685359
+  },
+  "GET - Homepage" : {
+    "transaction" : "GET - Homepage",
+    "sampleCount" : 90444,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 18.674737959400137,
+    "medianResTime" : 18.0,
+    "minResTime" : 0.0,
+    "maxResTime" : 187.0,
+    "pct1ResTime" : 61.0,
+    "pct2ResTime" : 76.0,
+    "pct3ResTime" : 114.0,
+    "throughput" : 754.5362777077928,
+    "receivedKBytesPerSec" : 9033.80348114994,
+    "sentKBytesPerSec" : 86.21166454278492
+  }
+}

@@ -1,0 +1,4556 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "learnhub-api-tests-v1"
+    },
+    "item": [
+      {
+        "id": "7c14c71b-126e-4136-9db6-06c4e19672c8",
+        "name": "Authentication",
+        "item": [
+          {
+            "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+            "name": "TC-API-001: Register User",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "auth",
+                  "register"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200 or 201', () => {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                    "});",
+                    "",
+                    "pm.test('Response has token', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('token');",
+                    "    pm.collectionVariables.set('auth_token', json.token);",
+                    "});",
+                    "",
+                    "pm.test('Response has user object', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('user');",
+                    "    pm.expect(json.user).to.have.property('email');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+                }
+              }
+            ]
+          },
+          {
+            "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+            "name": "TC-API-002: Login User",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "auth",
+                  "login"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "d1d3d9b8-d303-4cd4-9d93-273cf186a271",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', () => {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has token', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('token');",
+                    "    pm.collectionVariables.set('auth_token', json.token);",
+                    "});",
+                    "",
+                    "pm.test('Response time < 2s', () => {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "ad23242e-49ed-4988-832f-e8e45edda6f6"
+                }
+              }
+            ]
+          },
+          {
+            "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+            "name": "TC-API-003: Get Profile",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "auth",
+                  "profile"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', () => {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test('Profile has required fields', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('id');",
+                    "    pm.expect(json).to.have.property('email');",
+                    "    pm.expect(json).to.have.property('username');",
+                    "    pm.expect(json).to.have.property('role');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+                }
+              }
+            ]
+          },
+          {
+            "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+            "name": "TC-API-025: Unauthorized Access",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "auth",
+                  "profile"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 401', () => {",
+                    "    pm.expect(pm.response.code).to.equal(401);",
+                    "});",
+                    "",
+                    "pm.test('Error message present', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('error');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "98546eeb-9199-4183-9a9a-160dd7fb1364",
+        "name": "Courses",
+        "item": [
+          {
+            "id": "9d25b23f-a2c2-4755-8560-a7b1d5f961a0",
+            "name": "TC-API-011: Get All Courses",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "courses"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "d91c38cd-105c-4220-ab22-75d5071c4154",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', () => {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test('Response is array', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.be.an('array');",
+                    "});",
+                    "",
+                    "pm.test('Response time < 2s', () => {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                    "});",
+                    "",
+                    "if (pm.response.json().length > 0) {",
+                    "    pm.test('Course has required fields', () => {",
+                    "        const course = pm.response.json()[0];",
+                    "        pm.expect(course).to.have.property('id');",
+                    "        pm.expect(course).to.have.property('title');",
+                    "        pm.expect(course).to.have.property('description');",
+                    "    });",
+                    "}"
+                  ],
+                  "_lastExecutionId": "e3941941-8a1e-4a10-ac46-2070efd4e342"
+                }
+              }
+            ]
+          },
+          {
+            "id": "83be3241-5f4a-47a2-b115-c3b6685dc38d",
+            "name": "TC-API-012: Filter by Category",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "courses"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "category",
+                    "value": "Web Development"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "09a0cd64-25ba-45fc-b26f-2ae9485ff5e5",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', () => {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test('Filtered results returned', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.be.an('array');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "9d8a9410-7369-430f-ae0d-c79e609a88b0"
+                }
+              }
+            ]
+          },
+          {
+            "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+            "name": "TC-API-007: Create Course",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "courses"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"title\": \"API Test Course {{$timestamp}}\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "41d62169-a064-4f55-b3a3-539b649c9540",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 201 or 200', () => {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                    "});",
+                    "",
+                    "pm.test('Course created with ID', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('id');",
+                    "    pm.collectionVariables.set('test_course_id', json.id);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "bc182f96-0217-4614-bece-c9767b9db128"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "fb62bcbe-6985-4a6c-9c7f-01f3a21bde53",
+        "name": "Enrollments",
+        "item": [
+          {
+            "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+            "name": "TC-API-019: Request Enrollment",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "enrollments"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"courseId\": \"{{test_course_id}}\",\n  \"paymentAmount\": 0\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "ca8406df-ca01-46a4-b23f-81abe989c503",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 201 or 200', () => {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                    "});",
+                    "",
+                    "pm.test('Enrollment created', () => {",
+                    "    const json = pm.response.json();",
+                    "    pm.expect(json).to.have.property('id');",
+                    "    pm.expect(json.status).to.equal('pending');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "string",
+        "value": "http://localhost:5000",
+        "key": "base_url"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "auth_token"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "test_user_id"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "test_course_id"
+      }
+    ],
+    "info": {
+      "_postman_id": "learnhub-api-tests-v1",
+      "name": "LearnHub LMS API Tests",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Comprehensive API testing for LearnHub Learning Management System",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment"
+    },
+    "id": "learnhub-env-local",
+    "name": "LearnHub Local Environment",
+    "values": [
+      {
+        "type": "any",
+        "value": "http://localhost:5000",
+        "key": "base_url"
+      },
+      {
+        "type": "any",
+        "value": "http://localhost:3001",
+        "key": "frontend_url"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "auth_token"
+      }
+    ]
+  },
+  "globals": {
+    "id": "9333c2c3-a0e7-4aed-b54f-236ce9367d4e",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 8,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 8,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 8,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 8,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 8,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 19,
+        "pending": 0,
+        "failed": 8
+      },
+      "testScripts": {
+        "total": 8,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 30.750000000000004,
+      "responseMin": 4,
+      "responseMax": 125,
+      "responseSd": 44.48806019596718,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1769360094753,
+      "completed": 1769360095253
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 8,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "cd2e0a39-187d-4400-b35d-2cca5d6f2266",
+          "httpRequestId": "75b3ee11-afc3-4e00-843e-42f6c5e1d6fa"
+        },
+        "item": {
+          "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+          "name": "TC-API-001: Register User",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 or 201', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Response has token', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('token');",
+                  "    pm.collectionVariables.set('auth_token', json.token);",
+                  "});",
+                  "",
+                  "pm.test('Response has user object', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('user');",
+                  "    pm.expect(json.user).to.have.property('email');",
+                  "});"
+                ],
+                "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "auth",
+              "register"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "85c03802-c0e2-47c6-bb6a-1c81aff050bb",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "125",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"apitest1769360095\",\n  \"email\": \"apitest1769360095@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+          }
+        },
+        "response": {
+          "id": "c663a78a-cc29-418b-8c89-c8437f4a6cd2",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "161"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"a1-ktAPxUWK6FwcrQ0PZrYkkSn5lUY\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:54 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              58,
+              34,
+              101,
+              121,
+              74,
+              104,
+              98,
+              71,
+              99,
+              105,
+              79,
+              105,
+              74,
+              73,
+              85,
+              122,
+              73,
+              49,
+              78,
+              105,
+              73,
+              115,
+              73,
+              110,
+              82,
+              53,
+              99,
+              67,
+              73,
+              54,
+              73,
+              107,
+              112,
+              88,
+              86,
+              67,
+              74,
+              57,
+              46,
+              101,
+              121,
+              74,
+              49,
+              99,
+              50,
+              86,
+              121,
+              73,
+              106,
+              112,
+              55,
+              73,
+              109,
+              108,
+              107,
+              73,
+              106,
+              111,
+              53,
+              102,
+              83,
+              119,
+              105,
+              97,
+              87,
+              70,
+              48,
+              73,
+              106,
+              111,
+              120,
+              78,
+              122,
+              89,
+              53,
+              77,
+              122,
+              89,
+              119,
+              77,
+              68,
+              107,
+              48,
+              76,
+              67,
+              74,
+              108,
+              101,
+              72,
+              65,
+              105,
+              79,
+              106,
+              69,
+              51,
+              78,
+              106,
+              107,
+              122,
+              78,
+              106,
+              77,
+              50,
+              79,
+              84,
+              82,
+              57,
+              46,
+              85,
+              75,
+              68,
+              89,
+              77,
+              78,
+              51,
+              105,
+              55,
+              90,
+              98,
+              119,
+              72,
+              95,
+              72,
+              88,
+              119,
+              103,
+              51,
+              83,
+              69,
+              55,
+              56,
+              51,
+              95,
+              51,
+              104,
+              107,
+              65,
+              81,
+              101,
+              110,
+              57,
+              66,
+              70,
+              45,
+              69,
+              99,
+              76,
+              48,
+              110,
+              87,
+              77,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 125,
+          "responseSize": 161
+        },
+        "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 or 201",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has token",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has user object",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 2,
+              "test": "Response has user object",
+              "message": "expected { Object (token) } to have property 'user'",
+              "stack": "AssertionError: expected { Object (token) } to have property 'user'\n   at Object.eval sandbox-script.js:3:1)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "6adfba5c-db10-4058-937c-149fdd263a25",
+          "length": 8,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "a3868b1c-b2b6-42ce-a2d1-e6968341ccc9"
+        },
+        "item": {
+          "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+          "name": "TC-API-002: Login User",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d1d3d9b8-d303-4cd4-9d93-273cf186a271",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has token', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('token');",
+                  "    pm.collectionVariables.set('auth_token', json.token);",
+                  "});",
+                  "",
+                  "pm.test('Response time < 2s', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "_lastExecutionId": "ad23242e-49ed-4988-832f-e8e45edda6f6"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "769911fd-6680-4c2b-b753-a3487b42a179",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "60",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+          }
+        },
+        "response": {
+          "id": "826b633c-577e-4759-bc21-aa2e883effd5",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "210"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"d2-gIxxYfiftXh9Cc6Gmbbn77CjuJM\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:54 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              58,
+              34,
+              101,
+              121,
+              74,
+              104,
+              98,
+              71,
+              99,
+              105,
+              79,
+              105,
+              74,
+              73,
+              85,
+              122,
+              73,
+              49,
+              78,
+              105,
+              73,
+              115,
+              73,
+              110,
+              82,
+              53,
+              99,
+              67,
+              73,
+              54,
+              73,
+              107,
+              112,
+              88,
+              86,
+              67,
+              74,
+              57,
+              46,
+              101,
+              121,
+              74,
+              49,
+              99,
+              50,
+              86,
+              121,
+              73,
+              106,
+              112,
+              55,
+              73,
+              109,
+              108,
+              107,
+              73,
+              106,
+              111,
+              48,
+              102,
+              83,
+              119,
+              105,
+              97,
+              87,
+              70,
+              48,
+              73,
+              106,
+              111,
+              120,
+              78,
+              122,
+              89,
+              53,
+              77,
+              122,
+              89,
+              119,
+              77,
+              68,
+              107,
+              49,
+              76,
+              67,
+              74,
+              108,
+              101,
+              72,
+              65,
+              105,
+              79,
+              106,
+              69,
+              51,
+              78,
+              106,
+              107,
+              122,
+              78,
+              106,
+              77,
+              50,
+              79,
+              84,
+              86,
+              57,
+              46,
+              45,
+              83,
+              88,
+              106,
+              117,
+              90,
+              70,
+              90,
+              56,
+              74,
+              100,
+              115,
+              107,
+              67,
+              52,
+              71,
+              113,
+              73,
+              90,
+              114,
+              89,
+              75,
+              117,
+              104,
+              97,
+              86,
+              103,
+              106,
+              82,
+              67,
+              108,
+              104,
+              71,
+              57,
+              80,
+              71,
+              113,
+              87,
+              121,
+              52,
+              78,
+              80,
+              48,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              101,
+              34,
+              58,
+              34,
+              117,
+              115,
+              101,
+              114,
+              34,
+              44,
+              34,
+              105,
+              100,
+              34,
+              58,
+              52,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              84,
+              101,
+              115,
+              116,
+              32,
+              83,
+              116,
+              117,
+              100,
+              101,
+              110,
+              116,
+              32,
+              49,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 87,
+          "responseSize": 210
+        },
+        "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has token",
+            "skipped": false
+          },
+          {
+            "assertion": "Response time < 2s",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "4efdad8a-9097-4c8a-a139-95422f0d7998",
+          "length": 8,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "c9386039-fafe-4ed3-9f82-43fb60ca8c2b"
+        },
+        "item": {
+          "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+          "name": "TC-API-003: Get Profile",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Profile has required fields', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('email');",
+                  "    pm.expect(json).to.have.property('username');",
+                  "    pm.expect(json).to.have.property('role');",
+                  "});"
+                ],
+                "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "auth",
+              "profile"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer "
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "ab08f333-490f-4e18-a3d0-732d3d5685f9",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "44e70572-11a3-4450-81bd-1282d13c18bf",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "32"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"20-STwq+yrPj9nApV+vuN/n4hNNfLU\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:55 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              111,
+              107,
+              101,
+              110,
+              32,
+              105,
+              115,
+              32,
+              110,
+              111,
+              116,
+              32,
+              118,
+              97,
+              108,
+              105,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 5,
+          "responseSize": 32
+        },
+        "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code is 200",
+              "message": "expected 401 to equal 200",
+              "stack": "AssertionError: expected 401 to equal 200\n   at Object.eval sandbox-script.js:1:3)"
+            }
+          },
+          {
+            "assertion": "Profile has required fields",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Profile has required fields",
+              "message": "expected { message: 'Token is not valid' } to have property 'id'",
+              "stack": "AssertionError: expected { message: 'Token is not valid' } to have property 'id'\n   at Object.eval sandbox-script.js:2:3)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "a39084e2-d1fe-4382-b5f1-3e2773276696",
+          "length": 8,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "196c0d8b-2c45-427d-8d52-385a72d9799f"
+        },
+        "item": {
+          "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+          "name": "TC-API-025: Unauthorized Access",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', () => {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "",
+                  "pm.test('Error message present', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('error');",
+                  "});"
+                ],
+                "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "auth",
+              "profile"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "c2213aab-1ca5-47dc-95e2-7593b0b75f1d",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "ea721ba9-649d-4345-9e72-1f3bd274a4b1",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "44"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2c-WzDYMKUce5OQ4gcCnjjWFLoucNw\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:55 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              78,
+              111,
+              32,
+              116,
+              111,
+              107,
+              101,
+              110,
+              44,
+              32,
+              97,
+              117,
+              116,
+              104,
+              111,
+              114,
+              105,
+              122,
+              97,
+              116,
+              105,
+              111,
+              110,
+              32,
+              100,
+              101,
+              110,
+              105,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 4,
+          "responseSize": 44
+        },
+        "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+        "assertions": [
+          {
+            "assertion": "Status code is 401",
+            "skipped": false
+          },
+          {
+            "assertion": "Error message present",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Error message present",
+              "message": "expected { Object (message) } to have property 'error'",
+              "stack": "AssertionError: expected { Object (message) } to have property 'error'\n   at Object.eval sandbox-script.js:2:4)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "ce7a3e81-a2b4-4369-80a5-69ae0b8be237",
+          "length": 8,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "90e23307-6602-412e-83cb-c998fbd06597"
+        },
+        "item": {
+          "id": "9d25b23f-a2c2-4755-8560-a7b1d5f961a0",
+          "name": "TC-API-011: Get All Courses",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "courses"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d91c38cd-105c-4220-ab22-75d5071c4154",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response time < 2s', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "if (pm.response.json().length > 0) {",
+                  "    pm.test('Course has required fields', () => {",
+                  "        const course = pm.response.json()[0];",
+                  "        pm.expect(course).to.have.property('id');",
+                  "        pm.expect(course).to.have.property('title');",
+                  "        pm.expect(course).to.have.property('description');",
+                  "    });",
+                  "}"
+                ],
+                "_lastExecutionId": "e3941941-8a1e-4a10-ac46-2070efd4e342"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "courses"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "c8e1f739-cd6c-46ac-a385-7e8413b95a08",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "f155a1cb-7a9a-4288-bf91-74b86b2bd931",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "2"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:55 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 2
+        },
+        "id": "9d25b23f-a2c2-4755-8560-a7b1d5f961a0",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response is array",
+            "skipped": false
+          },
+          {
+            "assertion": "Response time < 2s",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "cb06f6d2-68cf-40e7-924a-b2893c2685e8",
+          "length": 8,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "8385d47b-b86b-4384-9742-b9f169f27f31"
+        },
+        "item": {
+          "id": "83be3241-5f4a-47a2-b115-c3b6685dc38d",
+          "name": "TC-API-012: Filter by Category",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "courses"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Web Development"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "09a0cd64-25ba-45fc-b26f-2ae9485ff5e5",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Filtered results returned', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ],
+                "_lastExecutionId": "9d8a9410-7369-430f-ae0d-c79e609a88b0"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "courses"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [
+              {
+                "key": "category",
+                "value": "Web%20Development"
+              }
+            ],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "768d3dc1-8efa-49b7-bc20-dad07d366b24",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "ee69ba83-4c3b-4112-9805-716410120f85",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "2"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:55 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 2
+        },
+        "id": "83be3241-5f4a-47a2-b115-c3b6685dc38d",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Filtered results returned",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "42e019cb-f2da-4e5c-8731-1c78ba6b091b",
+          "length": 8,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "ebcca102-eb4f-4f55-8aa4-626a97ed6cb2"
+        },
+        "item": {
+          "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+          "name": "TC-API-007: Create Course",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "courses"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"API Test Course {{$timestamp}}\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "41d62169-a064-4f55-b3a3-539b649c9540",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 or 200', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Course created with ID', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.collectionVariables.set('test_course_id', json.id);",
+                  "});"
+                ],
+                "_lastExecutionId": "bc182f96-0217-4614-bece-c9767b9db128"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "courses"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer "
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "3a23fa07-5a3c-44ed-9f65-ce72d9a09c5d",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "216",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"API Test Course 1769360095\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+          }
+        },
+        "response": {
+          "id": "e739ca76-3705-42b3-9da7-441c71ee3413",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "32"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"20-STwq+yrPj9nApV+vuN/n4hNNfLU\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:55 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              111,
+              107,
+              101,
+              110,
+              32,
+              105,
+              115,
+              32,
+              110,
+              111,
+              116,
+              32,
+              118,
+              97,
+              108,
+              105,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 4,
+          "responseSize": 32
+        },
+        "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+        "assertions": [
+          {
+            "assertion": "Status code is 201 or 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code is 201 or 200",
+              "message": "expected 401 to be one of [ 200, 201 ]",
+              "stack": "AssertionError: expected 401 to be one of [ 200, 201 ]\n   at Object.eval sandbox-script.js:1:7)"
+            }
+          },
+          {
+            "assertion": "Course created with ID",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Course created with ID",
+              "message": "expected { message: 'Token is not valid' } to have property 'id'",
+              "stack": "AssertionError: expected { message: 'Token is not valid' } to have property 'id'\n   at Object.eval sandbox-script.js:2:7)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "33632702-80f7-4a1d-a18d-70e571d5401a",
+          "length": 8,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "e163711e-5057-4669-8a55-8ba94b6343f9"
+        },
+        "item": {
+          "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+          "name": "TC-API-019: Request Enrollment",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "enrollments"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{test_course_id}}\",\n  \"paymentAmount\": 0\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ca8406df-ca01-46a4-b23f-81abe989c503",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 or 200', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Enrollment created', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.status).to.equal('pending');",
+                  "});"
+                ],
+                "_lastExecutionId": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "5000",
+            "path": [
+              "api",
+              "enrollments"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer "
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "047ea974-6f1c-4a9c-b9a1-3e1330916c47",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:5000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "42",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"courseId\": \"\",\n  \"paymentAmount\": 0\n}"
+          }
+        },
+        "response": {
+          "id": "9b074327-e050-4ae6-ad01-6473c541f27e",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "32"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"20-STwq+yrPj9nApV+vuN/n4hNNfLU\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 25 Jan 2026 16:54:55 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              111,
+              107,
+              101,
+              110,
+              32,
+              105,
+              115,
+              32,
+              110,
+              111,
+              116,
+              32,
+              118,
+              97,
+              108,
+              105,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 32
+        },
+        "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+        "assertions": [
+          {
+            "assertion": "Status code is 201 or 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code is 201 or 200",
+              "message": "expected 401 to be one of [ 200, 201 ]",
+              "stack": "AssertionError: expected 401 to be one of [ 200, 201 ]\n   at Object.eval sandbox-script.js:1:8)"
+            }
+          },
+          {
+            "assertion": "Enrollment created",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Enrollment created",
+              "message": "expected { message: 'Token is not valid' } to have property 'id'",
+              "stack": "AssertionError: expected { message: 'Token is not valid' } to have property 'id'\n   at Object.eval sandbox-script.js:2:8)"
+            }
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 515
+    },
+    "failures": [
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 2,
+          "test": "Response has user object",
+          "message": "expected { Object (token) } to have property 'user'",
+          "stack": "AssertionError: expected { Object (token) } to have property 'user'\n   at Object.eval sandbox-script.js:3:1)",
+          "checksum": "a6670cd0516b3c330a77de24fa42b92f",
+          "id": "962cbad5-39bc-4215-b41b-8fa61f6891aa",
+          "timestamp": 1769360094934,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 3,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 1,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:2 in test-script",
+        "source": {
+          "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+          "name": "TC-API-001: Register User",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 or 201', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Response has token', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('token');",
+                  "    pm.collectionVariables.set('auth_token', json.token);",
+                  "});",
+                  "",
+                  "pm.test('Response has user object', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('user');",
+                  "    pm.expect(json.user).to.have.property('email');",
+                  "});"
+                ],
+                "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "7c14c71b-126e-4136-9db6-06c4e19672c8",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+              "name": "TC-API-001: Register User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 201', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response has user object', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('user');",
+                      "    pm.expect(json.user).to.have.property('email');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+              "name": "TC-API-002: Login User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d1d3d9b8-d303-4cd4-9d93-273cf186a271",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response time < 2s', () => {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "ad23242e-49ed-4988-832f-e8e45edda6f6"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+              "name": "TC-API-003: Get Profile",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Profile has required fields', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('email');",
+                      "    pm.expect(json).to.have.property('username');",
+                      "    pm.expect(json).to.have.property('role');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+              "name": "TC-API-025: Unauthorized Access",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 401', () => {",
+                      "    pm.expect(pm.response.code).to.equal(401);",
+                      "});",
+                      "",
+                      "pm.test('Error message present', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('error');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 8,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "cd2e0a39-187d-4400-b35d-2cca5d6f2266",
+          "httpRequestId": "75b3ee11-afc3-4e00-843e-42f6c5e1d6fa",
+          "scriptId": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+          "execution": "5154f541-6d00-43c0-8208-b5de2b33c533"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code is 200",
+          "message": "expected 401 to equal 200",
+          "stack": "AssertionError: expected 401 to equal 200\n   at Object.eval sandbox-script.js:1:3)",
+          "checksum": "80c99019a98d583b1c5682b62a2d16c6",
+          "id": "6dee9d81-a778-4095-aebc-e3c259732541",
+          "timestamp": 1769360095084,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+          "name": "TC-API-003: Get Profile",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Profile has required fields', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('email');",
+                  "    pm.expect(json).to.have.property('username');",
+                  "    pm.expect(json).to.have.property('role');",
+                  "});"
+                ],
+                "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "7c14c71b-126e-4136-9db6-06c4e19672c8",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+              "name": "TC-API-001: Register User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 201', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response has user object', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('user');",
+                      "    pm.expect(json.user).to.have.property('email');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+              "name": "TC-API-002: Login User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d1d3d9b8-d303-4cd4-9d93-273cf186a271",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response time < 2s', () => {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "ad23242e-49ed-4988-832f-e8e45edda6f6"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+              "name": "TC-API-003: Get Profile",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Profile has required fields', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('email');",
+                      "    pm.expect(json).to.have.property('username');",
+                      "    pm.expect(json).to.have.property('role');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+              "name": "TC-API-025: Unauthorized Access",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 401', () => {",
+                      "    pm.expect(pm.response.code).to.equal(401);",
+                      "});",
+                      "",
+                      "pm.test('Error message present', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('error');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "4efdad8a-9097-4c8a-a139-95422f0d7998",
+          "length": 8,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "c9386039-fafe-4ed3-9f82-43fb60ca8c2b",
+          "scriptId": "2d292344-fb0a-499c-8efd-9037414b42db",
+          "execution": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Profile has required fields",
+          "message": "expected { message: 'Token is not valid' } to have property 'id'",
+          "stack": "AssertionError: expected { message: 'Token is not valid' } to have property 'id'\n   at Object.eval sandbox-script.js:2:3)",
+          "checksum": "eb1b6d33ae27ce9309746e7ec36a7d94",
+          "id": "003a82da-d1d6-46cd-8154-9c905d56b64d",
+          "timestamp": 1769360095086,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+          "name": "TC-API-003: Get Profile",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Profile has required fields', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('email');",
+                  "    pm.expect(json).to.have.property('username');",
+                  "    pm.expect(json).to.have.property('role');",
+                  "});"
+                ],
+                "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "7c14c71b-126e-4136-9db6-06c4e19672c8",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+              "name": "TC-API-001: Register User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 201', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response has user object', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('user');",
+                      "    pm.expect(json.user).to.have.property('email');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+              "name": "TC-API-002: Login User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d1d3d9b8-d303-4cd4-9d93-273cf186a271",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response time < 2s', () => {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "ad23242e-49ed-4988-832f-e8e45edda6f6"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+              "name": "TC-API-003: Get Profile",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Profile has required fields', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('email');",
+                      "    pm.expect(json).to.have.property('username');",
+                      "    pm.expect(json).to.have.property('role');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+              "name": "TC-API-025: Unauthorized Access",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 401', () => {",
+                      "    pm.expect(pm.response.code).to.equal(401);",
+                      "});",
+                      "",
+                      "pm.test('Error message present', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('error');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "4efdad8a-9097-4c8a-a139-95422f0d7998",
+          "length": 8,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "c9386039-fafe-4ed3-9f82-43fb60ca8c2b",
+          "scriptId": "2d292344-fb0a-499c-8efd-9037414b42db",
+          "execution": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Error message present",
+          "message": "expected { Object (message) } to have property 'error'",
+          "stack": "AssertionError: expected { Object (message) } to have property 'error'\n   at Object.eval sandbox-script.js:2:4)",
+          "checksum": "98462b50be141661cc7d55e003723d6c",
+          "id": "bc87a19b-bc96-4b19-8f0f-69b7f184046e",
+          "timestamp": 1769360095118,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 4,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+          "name": "TC-API-025: Unauthorized Access",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', () => {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "",
+                  "pm.test('Error message present', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('error');",
+                  "});"
+                ],
+                "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "7c14c71b-126e-4136-9db6-06c4e19672c8",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "c62b588e-2e71-43c7-9c2b-27a7a25582e4",
+              "name": "TC-API-001: Register User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"apitest{{$timestamp}}\",\n  \"email\": \"apitest{{$timestamp}}@test.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"student\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "5948d4fd-1e39-4afd-96e6-d0b0e2f497d8",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 or 201', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response has user object', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('user');",
+                      "    pm.expect(json.user).to.have.property('email');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "5154f541-6d00-43c0-8208-b5de2b33c533"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "31b3c1ff-0bd4-445c-b5b2-d823f10343d7",
+              "name": "TC-API-002: Login User",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student1@test.com\",\n  \"password\": \"Test123!\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d1d3d9b8-d303-4cd4-9d93-273cf186a271",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has token', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('token');",
+                      "    pm.collectionVariables.set('auth_token', json.token);",
+                      "});",
+                      "",
+                      "pm.test('Response time < 2s', () => {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "ad23242e-49ed-4988-832f-e8e45edda6f6"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "a0b912bb-593a-4a7f-ab38-fdf3294380ef",
+              "name": "TC-API-003: Get Profile",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "2d292344-fb0a-499c-8efd-9037414b42db",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Profile has required fields', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('email');",
+                      "    pm.expect(json).to.have.property('username');",
+                      "    pm.expect(json).to.have.property('role');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e6e865d2-a58a-4e21-bccf-970e8604fc45"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "42af1063-1355-4dd4-be0a-921718a7c0a4",
+              "name": "TC-API-025: Unauthorized Access",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 401', () => {",
+                      "    pm.expect(pm.response.code).to.equal(401);",
+                      "});",
+                      "",
+                      "pm.test('Error message present', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('error');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2b956473-21c9-4d00-853b-74e52c2613c2"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "a39084e2-d1fe-4382-b5f1-3e2773276696",
+          "length": 8,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "196c0d8b-2c45-427d-8d52-385a72d9799f",
+          "scriptId": "652d9599-d2bb-4725-bcfd-b75099ca1886",
+          "execution": "2b956473-21c9-4d00-853b-74e52c2613c2"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code is 201 or 200",
+          "message": "expected 401 to be one of [ 200, 201 ]",
+          "stack": "AssertionError: expected 401 to be one of [ 200, 201 ]\n   at Object.eval sandbox-script.js:1:7)",
+          "checksum": "951611c1e3d70de4370e8f1ce1c2fd69",
+          "id": "38851f36-2b16-498e-9f48-a7cff87cf16d",
+          "timestamp": 1769360095211,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 7,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+          "name": "TC-API-007: Create Course",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "courses"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"API Test Course {{$timestamp}}\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "41d62169-a064-4f55-b3a3-539b649c9540",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 or 200', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Course created with ID', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.collectionVariables.set('test_course_id', json.id);",
+                  "});"
+                ],
+                "_lastExecutionId": "bc182f96-0217-4614-bece-c9767b9db128"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "98546eeb-9199-4183-9a9a-160dd7fb1364",
+          "name": "Courses",
+          "item": [
+            {
+              "id": "9d25b23f-a2c2-4755-8560-a7b1d5f961a0",
+              "name": "TC-API-011: Get All Courses",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d91c38cd-105c-4220-ab22-75d5071c4154",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is array', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('Response time < 2s', () => {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "",
+                      "if (pm.response.json().length > 0) {",
+                      "    pm.test('Course has required fields', () => {",
+                      "        const course = pm.response.json()[0];",
+                      "        pm.expect(course).to.have.property('id');",
+                      "        pm.expect(course).to.have.property('title');",
+                      "        pm.expect(course).to.have.property('description');",
+                      "    });",
+                      "}"
+                    ],
+                    "_lastExecutionId": "e3941941-8a1e-4a10-ac46-2070efd4e342"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "83be3241-5f4a-47a2-b115-c3b6685dc38d",
+              "name": "TC-API-012: Filter by Category",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "category",
+                      "value": "Web Development"
+                    }
+                  ],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "09a0cd64-25ba-45fc-b26f-2ae9485ff5e5",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Filtered results returned', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "9d8a9410-7369-430f-ae0d-c79e609a88b0"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+              "name": "TC-API-007: Create Course",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"API Test Course {{$timestamp}}\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "41d62169-a064-4f55-b3a3-539b649c9540",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201 or 200', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Course created with ID', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.collectionVariables.set('test_course_id', json.id);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "bc182f96-0217-4614-bece-c9767b9db128"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "42e019cb-f2da-4e5c-8731-1c78ba6b091b",
+          "length": 8,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "ebcca102-eb4f-4f55-8aa4-626a97ed6cb2",
+          "scriptId": "41d62169-a064-4f55-b3a3-539b649c9540",
+          "execution": "bc182f96-0217-4614-bece-c9767b9db128"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Course created with ID",
+          "message": "expected { message: 'Token is not valid' } to have property 'id'",
+          "stack": "AssertionError: expected { message: 'Token is not valid' } to have property 'id'\n   at Object.eval sandbox-script.js:2:7)",
+          "checksum": "be2f35256deac10751c5f880c548fd8b",
+          "id": "d45e3f09-d15c-43d6-b9ae-5d0f72ee9fba",
+          "timestamp": 1769360095212,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 7,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+          "name": "TC-API-007: Create Course",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "courses"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"API Test Course {{$timestamp}}\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "41d62169-a064-4f55-b3a3-539b649c9540",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 or 200', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Course created with ID', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.collectionVariables.set('test_course_id', json.id);",
+                  "});"
+                ],
+                "_lastExecutionId": "bc182f96-0217-4614-bece-c9767b9db128"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "98546eeb-9199-4183-9a9a-160dd7fb1364",
+          "name": "Courses",
+          "item": [
+            {
+              "id": "9d25b23f-a2c2-4755-8560-a7b1d5f961a0",
+              "name": "TC-API-011: Get All Courses",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d91c38cd-105c-4220-ab22-75d5071c4154",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is array', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('Response time < 2s', () => {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "",
+                      "if (pm.response.json().length > 0) {",
+                      "    pm.test('Course has required fields', () => {",
+                      "        const course = pm.response.json()[0];",
+                      "        pm.expect(course).to.have.property('id');",
+                      "        pm.expect(course).to.have.property('title');",
+                      "        pm.expect(course).to.have.property('description');",
+                      "    });",
+                      "}"
+                    ],
+                    "_lastExecutionId": "e3941941-8a1e-4a10-ac46-2070efd4e342"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "83be3241-5f4a-47a2-b115-c3b6685dc38d",
+              "name": "TC-API-012: Filter by Category",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "category",
+                      "value": "Web Development"
+                    }
+                  ],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "09a0cd64-25ba-45fc-b26f-2ae9485ff5e5",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', () => {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});",
+                      "",
+                      "pm.test('Filtered results returned', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "9d8a9410-7369-430f-ae0d-c79e609a88b0"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "081bb73f-986d-4bae-a0fd-444c5347a518",
+              "name": "TC-API-007: Create Course",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"API Test Course {{$timestamp}}\",\n  \"description\": \"Course created via API\",\n  \"category\": \"Technology\",\n  \"level\": \"beginner\",\n  \"courseType\": \"free\",\n  \"fee\": 0,\n  \"duration\": \"2 weeks\",\n  \"capacity\": 30\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "41d62169-a064-4f55-b3a3-539b649c9540",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201 or 200', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Course created with ID', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.collectionVariables.set('test_course_id', json.id);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "bc182f96-0217-4614-bece-c9767b9db128"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "42e019cb-f2da-4e5c-8731-1c78ba6b091b",
+          "length": 8,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "ebcca102-eb4f-4f55-8aa4-626a97ed6cb2",
+          "scriptId": "41d62169-a064-4f55-b3a3-539b649c9540",
+          "execution": "bc182f96-0217-4614-bece-c9767b9db128"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code is 201 or 200",
+          "message": "expected 401 to be one of [ 200, 201 ]",
+          "stack": "AssertionError: expected 401 to be one of [ 200, 201 ]\n   at Object.eval sandbox-script.js:1:8)",
+          "checksum": "59e7fac5740fb4354104c15be8fe7b5c",
+          "id": "d0c9e300-b7db-4e96-a539-8e387c3b3c61",
+          "timestamp": 1769360095244,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 8,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+          "name": "TC-API-019: Request Enrollment",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "enrollments"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{test_course_id}}\",\n  \"paymentAmount\": 0\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ca8406df-ca01-46a4-b23f-81abe989c503",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 or 200', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Enrollment created', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.status).to.equal('pending');",
+                  "});"
+                ],
+                "_lastExecutionId": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "fb62bcbe-6985-4a6c-9c7f-01f3a21bde53",
+          "name": "Enrollments",
+          "item": [
+            {
+              "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+              "name": "TC-API-019: Request Enrollment",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "enrollments"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"courseId\": \"{{test_course_id}}\",\n  \"paymentAmount\": 0\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "ca8406df-ca01-46a4-b23f-81abe989c503",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201 or 200', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Enrollment created', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json.status).to.equal('pending');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "33632702-80f7-4a1d-a18d-70e571d5401a",
+          "length": 8,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "e163711e-5057-4669-8a55-8ba94b6343f9",
+          "scriptId": "ca8406df-ca01-46a4-b23f-81abe989c503",
+          "execution": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Enrollment created",
+          "message": "expected { message: 'Token is not valid' } to have property 'id'",
+          "stack": "AssertionError: expected { message: 'Token is not valid' } to have property 'id'\n   at Object.eval sandbox-script.js:2:8)",
+          "checksum": "2aacb74246d43f66a491e161b0c6305c",
+          "id": "9646272b-95be-4ec6-bf92-3830324dba0e",
+          "timestamp": 1769360095245,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 8,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+          "name": "TC-API-019: Request Enrollment",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "enrollments"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{test_course_id}}\",\n  \"paymentAmount\": 0\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ca8406df-ca01-46a4-b23f-81abe989c503",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 or 200', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Enrollment created', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.status).to.equal('pending');",
+                  "});"
+                ],
+                "_lastExecutionId": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "fb62bcbe-6985-4a6c-9c7f-01f3a21bde53",
+          "name": "Enrollments",
+          "item": [
+            {
+              "id": "ffe3a4bd-1217-447d-8bc9-1cd4241b5902",
+              "name": "TC-API-019: Request Enrollment",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "enrollments"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"courseId\": \"{{test_course_id}}\",\n  \"paymentAmount\": 0\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "ca8406df-ca01-46a4-b23f-81abe989c503",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 201 or 200', () => {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "",
+                      "pm.test('Enrollment created', () => {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json.status).to.equal('pending');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "33632702-80f7-4a1d-a18d-70e571d5401a",
+          "length": 8,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "e163711e-5057-4669-8a55-8ba94b6343f9",
+          "scriptId": "ca8406df-ca01-46a4-b23f-81abe989c503",
+          "execution": "f4869b6d-ef1f-4b4b-8128-13343c3bfce0"
+        }
+      }
+    ],
+    "error": null
+  }
+}
