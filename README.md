@@ -156,7 +156,7 @@ softwareTestingAndQA/
 
 2. **Check service status**
    ```bash
-   docker compose ps
+   docker ps
    ```
 
 3. **View logs**
